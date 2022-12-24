@@ -1,34 +1,33 @@
-name: GitHub Pages
+name: github pages
 
 on:
   push:
     branches:
-      - main  # Set a branch to deploy
+      - main
   pull_request:
 
 jobs:
   deploy:
-    runs-on: ubuntu-22.04
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+    runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
         with:
-          submodules: true  # Fetch Hugo themes (true OR recursive)
-          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+          submodules: true
+          fetch-depth: 0
+          path: cactus
 
       - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v2
+        uses: peaceiris/actions-hugo@v2.4.13
         with:
-          hugo-version: '0.91.2'
-          # extended: true
+          hugo-version: 'latest'
+          extended: true
 
       - name: Build
-        run: hugo --minify
+        run: cd cactus/exampleSite && hugo --minify --themesDir ../.. --baseURL https://www.takuzen.me/hugo-theme-cactus/
 
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: peaceiris/actions-gh-pages@v3.7.3
+        if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+          publish_dir: cactus/exampleSite/public
